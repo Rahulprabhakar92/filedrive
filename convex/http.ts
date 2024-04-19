@@ -25,10 +25,14 @@ http.route({
       switch (result.type) {
         case "user.created":
           await ctx.runMutation(internal.users.createUser, {
-            
+            tokenIdentifier : `https://renewing-teal-12.clerk.accounts.dev|${result.data.id}`,
           });
           break;
- 
+          case "organizationMembership.created":
+            await ctx.runMutation(internal.users.addorgIdstoUser,{
+              tokenIdentifier : `https://renewing-teal-12.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
+              orgId:result.data.organization.id
+            })
         }
         return new Response(null, {
             status: 200,

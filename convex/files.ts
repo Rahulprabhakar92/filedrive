@@ -1,5 +1,20 @@
-import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { MutationCtx, QueryCtx, mutation, query } from "./_generated/server";
+import { ConvexError, v } from "convex/values";
+import { getUser } from "./users";
+
+
+async function hasAccestoorg(
+  ctx:QueryCtx | MutationCtx,
+  tokenIdentifier:string,
+  orgId:string
+  ) {
+
+  const user=await getUser(ctx,tokenIdentifier)
+
+  const haveacces=user.orgIds.includes(orgId) || user.tokenIdentifier.includes(orgId)
+
+  return haveacces;
+}
 
 export const createFile=mutation({
   args:{
@@ -8,9 +23,27 @@ export const createFile=mutation({
   },
   async handler(ctx,args){
     const identity=await ctx.auth.getUserIdentity()
+
     if (!identity) {
-      throw new Error("Unauthorized: Please sign in to perform this action.");
+      throw new ConvexError("Unauthorized: Please sign in to perform this action.");
     }
+
+    // console.log(hasAcces,"dsf")
+
+    // const user=await getUser(ctx,identity.tokenIdentifier)
+
+    // const hasAcces=user.orgIds.includes(args.orgId) ||
+    // user.tokenIdentifier.includes(args.orgId)
+
+    const hasAcces= await hasAccestoorg(ctx,identity.tokenIdentifier,args.orgId)
+
+    if(!hasAcces) {
+      throw new ConvexError("you do not belong to this org")
+    }
+
+   
+
+  
     await ctx.db.insert("files",{
       name:args.name,
       orgId:args.orgId
@@ -27,8 +60,14 @@ export const getFiles=query({
     if (!identity) {
       return[]
     }
+    const hasAcces= await hasAccestoorg(ctx,identity.tokenIdentifier,args.orgId)
 
-    return ctx.db.query('files').withIndex('by_orgIdd',q=>
+    if(!hasAcces) {
+     return []
+    }
+    
+
+    return ctx.db.query('files').withIndex('by_orgId',(q)=>
       q.eq('orgId',args.orgId)
     ).collect()
   }
