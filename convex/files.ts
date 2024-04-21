@@ -33,7 +33,8 @@ export const createFile=mutation({
   args:{
     name:v.string(),
     fileId: v.id("_storage"),
-    orgId:v.string()
+    orgId:v.string(),
+    type:v.union(v.literal("image"),v.literal("csv"),v.literal("pdf")),
   },
   async handler(ctx,args){
     const identity=await ctx.auth.getUserIdentity()
@@ -51,7 +52,8 @@ export const createFile=mutation({
     await ctx.db.insert("files",{
       name:args.name,
       fileId:args.fileId,
-      orgId:args.orgId
+      orgId:args.orgId,
+      type:args.type
     })
   }
 })
@@ -101,3 +103,6 @@ export const deletefile=mutation({
 
   }
 })
+
+
+

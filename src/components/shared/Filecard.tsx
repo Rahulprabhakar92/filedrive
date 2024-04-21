@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 import {
     Card,
     CardContent,
@@ -31,14 +31,19 @@ import {
   
 
   
-  import { Doc } from '../../../convex/_generated/dataModel'
+  import { Doc, Id } from '../../../convex/_generated/dataModel'
 import { Button } from '../ui/button'
-import { DeleteIcon, MoreVertical, TrashIcon } from 'lucide-react'
+import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff } from 'lucide-react'
 import { useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { toast } from '../ui/use-toast'
+import Image from 'next/image'
 
 
+// function getFileurl(fileId : Id<"_storage">) : string{
+//   return `${process.env.NEXT_PUBLIC_CONVEX_UR}/api/storage/${fileId}`;
+
+// }
 
 function FileCardActions({file}:{file:Doc<'files'>}){
     const [Isconfiremed,setconfiremed]=useState(false)
@@ -89,21 +94,47 @@ function FileCardActions({file}:{file:Doc<'files'>}){
     )
 
 }
-  
+
 
 const Filecard = ({file}:{file:Doc<'files'>}) => {
+
+  const typesIcons={
+    'image':<ImageIcon/>,
+    'pdf':<FileTextIcon/>,
+    'csv':<GanttChartIcon />,
+  }as Record <Doc<"files">['type'],ReactNode>
+  
+  
+  
   return (
+
 
     <Card>
   <CardHeader className='relative'>
-    <CardTitle>{file.name}</CardTitle>
+    <CardTitle className='flex flex-row gap-4 '>
+    <p>{typesIcons[file.type]}</p>
+    {file.name}
+    </CardTitle>
     <div className='absolute top-1 right-1'>
     <FileCardActions file={file}/>
     </div>
 
   </CardHeader>
   <CardContent>
-    <p>Card Content</p>
+    {file.type=== 'image' && (
+      // <Image 
+      // src={file.fileId}
+      // alt="the imagurl"
+      // height='500'
+      // width='500'
+      // />
+    <> 
+    <ImageIcon className='h-200 w-200'/>,
+    </> 
+
+    )}
+
+  
   </CardContent>
   <CardFooter>
     <Button>Download</Button>

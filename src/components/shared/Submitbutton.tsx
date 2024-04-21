@@ -30,6 +30,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { api } from "../../../convex/_generated/api";
+import { Doc } from "../../../convex/_generated/dataModel";
 
 const formSchema = z.object({
   title: z.string().min(2).max(200),
@@ -59,10 +60,7 @@ export default function Submitbutton() {
   const [open,close]=useState(false)
 
  async function onSubmit(values: z.infer<typeof formSchema>) {
-
-
-    try{
-      if(!orgId) return 
+    if(!orgId) return 
 
     const postUrl = await generateUploadUrl();
 
@@ -74,11 +72,20 @@ export default function Submitbutton() {
 
     const { storageId } = await result.json();
 
+    const types={
+      'image/png':'image',
+      'application/pdf':'pdf',
+      'text/csv':'csv',
+    }as Record <string , Doc<'files'>["type"]>
+
+
+    try{
     
-    createFile({ 
+   await createFile({ 
       name:values.title,
       fileId:storageId,
-      orgId:orgId 
+      orgId:orgId ,
+      type:types[values.file[0].type] 
     })
     form.reset()
     close(false)
