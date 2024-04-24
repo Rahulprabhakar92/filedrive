@@ -14,9 +14,6 @@ export default function Header(){
                 </Button>
             </SignInButton>
             </div>
-            
-           
             </div>
-
     </div>
 }

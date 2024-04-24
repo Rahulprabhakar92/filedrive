@@ -115,13 +115,6 @@ export default function Submitbutton() {
   
   const createFile = useMutation(api.files.createFile);
 
-
-  
-
-
-
- 
-
   return (
    
       <Dialog open={open} onOpenChange={close}>
@@ -183,9 +176,6 @@ export default function Submitbutton() {
       </DialogDescription>
     </DialogHeader>
   </DialogContent>
-</Dialog>
-
-
-   
+</Dialog>  
   );
 }

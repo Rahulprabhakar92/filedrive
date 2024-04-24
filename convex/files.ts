@@ -53,32 +53,48 @@ export const createFile=mutation({
       name:args.name,
       fileId:args.fileId,
       orgId:args.orgId,
-      type:args.type
+      type:args.type,
+      url:""
     })
   }
 })
 
-export const getFiles=query({
-  args:{
-    orgId:v.string(),
+export const getFiles = query({
+  args: {
+    orgId: v.string(),
+    query: v.optional(v.string()) // Include query field as optional
   },
-  async handler(ctx,args){
-    const identity=await ctx.auth.getUserIdentity()
+  async handler(ctx, args) {
+    const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      return[]
+      return [];
     }
-    const hasAcces= await hasAccestoorg(ctx,identity.tokenIdentifier,args.orgId)
+    const hasAccess = await hasAccestoorg(ctx, identity.tokenIdentifier, args.orgId);
 
-    if(!hasAcces) {
-     return []
+    if (!hasAccess) {
+      return [];
     }
-    
+    let files = await ctx.db
+      .query("files")
+      .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+      .collect();
 
-    return ctx.db.query('files').withIndex('by_orgId',(q)=>
-      q.eq('orgId',args.orgId)
-    ).collect()
+    const filesWithUrl = await Promise.all(
+      files.map(async (file) => ({
+        ...file,
+        url: await ctx.storage.getUrl(file.fileId),
+      }))
+    );
+
+    const query = args.query;
+    if (query) {
+      return filesWithUrl.filter((file) => file.name.includes(query));
+    } else {
+      return filesWithUrl;
+    }
   }
-})
+});
+
 
 export const deletefile=mutation({
   args:{
@@ -103,6 +119,4 @@ export const deletefile=mutation({
 
   }
 })
-
-
 

@@ -34,75 +34,27 @@ import {
   import { Doc, Id } from '../../../convex/_generated/dataModel'
 import { Button } from '../ui/button'
 import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff } from 'lucide-react'
-import { useMutation } from 'convex/react'
+import { useMutation,  useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { toast } from '../ui/use-toast'
 import Image from 'next/image'
+import { getURL } from 'next/dist/shared/lib/utils'
+import FileCardActions from './file-actions'
 
 
-// function getFileurl(fileId : Id<"_storage">) : string{
-//   return `${process.env.NEXT_PUBLIC_CONVEX_UR}/api/storage/${fileId}`;
-
-// }
-
-function FileCardActions({file}:{file:Doc<'files'>}){
-    const [Isconfiremed,setconfiremed]=useState(false)
-    const deletefile= useMutation(api.files.deletefile)
-
-    return(
-
-        <>
-<AlertDialog open={Isconfiremed} onOpenChange={setconfiremed}>
-  <AlertDialogContent>
-    <AlertDialogHeader>
-      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-      <AlertDialogDescription>
-        This action cannot be undone. This will permanently delete your File
-        and remove your data from our servers.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel>Cancel</AlertDialogCancel>
-      <AlertDialogAction onClick={()=>{
-        deletefile({fileId:file._id})
-
-        toast({
-            variant:"default",
-            title: "File Deleted",
-            description: "U Deleted it ",
-          })
-      
-
-      }}>Continue</AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
-
-         <DropdownMenu>
-  <DropdownMenuTrigger> 
-    <MoreVertical/>
-</DropdownMenuTrigger>
-  <DropdownMenuContent>
-    <DropdownMenuItem className='flex gap-1 items-center text-red-500 cursor:pointer'
-    onClick={()=>{setconfiremed(true)}}>
-    <TrashIcon className='h-4 w-4 ' />  
-    Delete
-    </DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>
-</>
-    )
-
-}
 
 
-const Filecard = ({file}:{file:Doc<'files'>}) => {
+
+
+const Filecard = ({file}:{file:Doc<'files'>} & { url : string | null}) => {
 
   const typesIcons={
     'image':<ImageIcon/>,
     'pdf':<FileTextIcon/>,
     'csv':<GanttChartIcon />,
   }as Record <Doc<"files">['type'],ReactNode>
+
+  const imageUrl = file.type === "image" && URL ? URL : '';
   
   
   
@@ -116,28 +68,30 @@ const Filecard = ({file}:{file:Doc<'files'>}) => {
     {file.name}
     </CardTitle>
     <div className='absolute top-1 right-1'>
-    <FileCardActions file={file}/>
+      <FileCardActions  file={file}/>
     </div>
 
   </CardHeader>
-  <CardContent>
-    {file.type=== 'image' && (
-      // <Image 
-      // src={file.fileId}
-      // alt="the imagurl"
-      // height='500'
-      // width='500'
-      // />
-    <> 
-    <ImageIcon className='h-200 w-200'/>,
-    </> 
+  <CardContent className='h-[200px]  flex justify-center items-center '>
 
+      {file.type === "image" && file.url && (
+        <Image alt={file.name} width="200" height="100" src={file.url} />
+      )}
+      
+    {file.type === 'pdf' && (
+      <FileTextIcon className='h-20 w-20'/>
     )}
-
-  
+    {file.type === 'csv' && (
+      <GanttChartIcon  className=' w-20 h-20'/>
+    )}
   </CardContent>
-  <CardFooter>
-    <Button>Download</Button>
+  <CardFooter className='flex items-center justify-center'>
+    <Button onClick={()=>{
+      if(!file.url) return;
+      window.open(file.url,"_blank")
+    }}>
+     Download 
+    </Button>
   </CardFooter>
 </Card>
 
