@@ -2,6 +2,7 @@ import { MutationCtx, QueryCtx, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { getUser } from "./users";
 import { error } from "console";
+import { Id } from "./_generated/dataModel";
 
 
 async function hasAccestoorg(
@@ -62,7 +63,8 @@ export const createFile=mutation({
 export const getFiles = query({
   args: {
     orgId: v.string(),
-    query: v.optional(v.string()) // Include query field as optional
+    query: v.optional(v.string()), // Include query field as optional
+    favorites:v.optional(v.boolean())
   },
   async handler(ctx, args) {
     const identity = await ctx.auth.getUserIdentity();
@@ -78,20 +80,44 @@ export const getFiles = query({
       .query("files")
       .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
       .collect();
+      
+      const query = args.query;
+      if (query) {
+        files= files.filter((file) => file.name.toLowerCase().includes(query.toLowerCase()));
+      }
+    
 
-    const filesWithUrl = await Promise.all(
+    if(args.favorites){
+      const user=await ctx.db.query('users')
+       .withIndex('by_tokenIdentifier',q => q.eq('tokenIdentifier',identity.tokenIdentifier))
+        .first()
+  
+      if(!user) throw new ConvexError("User not Found")
+
+      const favorites = await ctx.db
+        .query("favorites")
+        .withIndex("by_userId_orgId_fileId", (q) =>
+          q.eq("userId", user._id).eq("orgId", args.orgId)
+        )
+        .collect();
+
+        files = files.filter((file) =>
+        favorites.some((favorite) => favorite.fileId === file._id)
+        
+      );
+    }
+   
+
+    let filesWithUrl = await Promise.all(
       files.map(async (file) => ({
         ...file,
         url: await ctx.storage.getUrl(file.fileId),
       }))
     );
+    
+   
+    return filesWithUrl
 
-    const query = args.query;
-    if (query) {
-      return filesWithUrl.filter((file) => file.name.includes(query));
-    } else {
-      return filesWithUrl;
-    }
   }
 });
 
@@ -120,3 +146,72 @@ export const deletefile=mutation({
   }
 })
 
+export const Favorite=mutation({
+  args:{
+    fileId:v.id("files")
+  },
+  async handler(ctx,args){
+    // const acces=hasAccestofile(ctx,args.fileId)
+
+    // if(!acces) throw new ConvexError('no acces to the file')
+    const identity=await ctx.auth.getUserIdentity()
+
+  if (!identity) {
+    return null
+  }
+  const file =  await ctx.db.get(args.fileId)
+
+  if(!file) return null
+
+  const hasAcces= await hasAccestoorg(ctx,identity.tokenIdentifier,file.orgId)
+
+  if(!hasAcces)  return null
+  const user=await ctx.db.query('users')
+       .withIndex('by_tokenIdentifier',q => q.eq('tokenIdentifier',identity.tokenIdentifier))
+        .first()
+  
+  if(!user) throw new ConvexError("User not Found")
+
+    const favorite=await ctx.db.query("favorites")
+    .withIndex("by_userId_orgId_fileId",q=> 
+    q.eq('userId',user._id).eq('orgId',file.orgId).eq('fileId',args.fileId))
+    .first()
+
+    if(!favorite){
+      await ctx.db.insert('favorites',{
+        fileId:file._id,
+        userId:user._id,
+        orgId:file.orgId
+      })
+    }else{
+      await ctx.db.delete(favorite._id)
+
+    }
+  }
+})
+
+async function hasAccestofile
+(ctx:QueryCtx | MutationCtx ,
+  fileId:Id<'files'>)
+{
+  const identity=await ctx.auth.getUserIdentity()
+
+  if (!identity) {
+    return null
+  }
+  const file =  await ctx.db.get(fileId)
+
+  if(!file) return null
+
+  const hasAcces= await hasAccestoorg(ctx,identity.tokenIdentifier,file.orgId)
+
+  if(!hasAcces)  return null
+  const user=await ctx.db.query('users')
+       .withIndex('by_tokenIdentifier',q => q.eq('tokenIdentifier',identity.tokenIdentifier))
+        .first()
+  
+  if(!user) throw new ConvexError("User not Found")
+
+  return {user,file}
+
+}

@@ -31,12 +31,12 @@ import {
   
 
   
-  import { Doc, Id } from '../../../convex/_generated/dataModel'
-import { Button } from '../ui/button'
+  import { Doc, Id } from '../../../../convex/_generated/dataModel'
+import { Button } from '../../../components/ui/button'
 import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff } from 'lucide-react'
 import { useMutation,  useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { toast } from '../ui/use-toast'
+import { api } from '../../../../convex/_generated/api'
+import { toast } from '../../../components/ui/use-toast'
 import Image from 'next/image'
 import { getURL } from 'next/dist/shared/lib/utils'
 import FileCardActions from './file-actions'

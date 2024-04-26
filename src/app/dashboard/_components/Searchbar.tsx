@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { z } from "zod"
-import { Form,FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form"
-import { Button } from "../components/ui/button"
-import { Loader2 } from "lucide-react"
-import { Input } from "../components/ui/input"
+import { Form,FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form"
+import { Button } from "../../../components/ui/button"
+import { Loader2, SearchIcon } from "lucide-react"
+import { Input } from "../../../components/ui/input"
 import { useForm } from "react-hook-form"
 import { Dispatch, SetStateAction } from "react"
 
@@ -46,8 +46,9 @@ export default function Searchbar({query,setquery}:{
         />
         <Button type="submit"
          disabled={form.formState.isSubmitting} 
-         className="flex gap-2">
+         className="flex gap-2 size-90">
           {form.formState.isSubmitting && (<Loader2 className="animate-spin mr-2 h-4 w-4" />)}
+          <SearchIcon/>
           Submit</Button>
       </form>
     </Form>

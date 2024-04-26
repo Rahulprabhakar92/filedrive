@@ -24,18 +24,19 @@ import React, { ReactNode, useState } from 'react'
   
 
   
-  import { Doc, Id } from '../../../convex/_generated/dataModel'
-import { Button } from '../ui/button'
-import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff } from 'lucide-react'
+  import { Doc, Id } from '../../../../convex/_generated/dataModel'
+import { Button } from '../../../components/ui/button'
+import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff, StarIcon } from 'lucide-react'
 import { useMutation,  useQuery } from 'convex/react'
-import { api } from '../../../convex/_generated/api'
-import { toast } from '../ui/use-toast'
+import { api } from '../../../../convex/_generated/api'
+import { toast } from '../../../components/ui/use-toast'
 
 
 
 export default function FileCardActions({file}:{file:Doc<'files'>} ){
     const [Isconfiremed,setconfiremed]=useState(false)
     const deletefile= useMutation(api.files.deletefile)
+    const Favorite=useMutation(api.files.Favorite)
 
 
     return(
@@ -72,6 +73,16 @@ export default function FileCardActions({file}:{file:Doc<'files'>} ){
     <MoreVertical/>
 </DropdownMenuTrigger>
   <DropdownMenuContent>
+    <DropdownMenuItem className='flex gap-1 items-center text-yellow-500 cursor:pointer'
+    onClick={()=>{
+      Favorite({fileId:file._id})
+
+
+    }}>
+    <StarIcon className='h-4 w-4 ' />  
+    Favorite
+    </DropdownMenuItem>
+    <DropdownMenuSeparator/>
     <DropdownMenuItem className='flex gap-1 items-center text-red-500 cursor:pointer'
     onClick={()=>{setconfiremed(true)}}>
     <TrashIcon className='h-4 w-4 ' />  
