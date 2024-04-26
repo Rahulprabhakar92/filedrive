@@ -46,18 +46,24 @@ import FileCardActions from './file-actions'
 
 
 
-const Filecard = ({file}:{file:Doc<'files'>} & { url : string | null}) => {
+const Filecard = ({file,favorites}:{file:Doc<'files'>} & { url : string | null} 
+& {favorites:Doc<"favorites">[]}) => {
 
   const typesIcons={
-    'image':<ImageIcon/>,
+    'image':<ImageIcon/>, 
     'pdf':<FileTextIcon/>,
     'csv':<GanttChartIcon />,
   }as Record <Doc<"files">['type'],ReactNode>
 
   const imageUrl = file.type === "image" && URL ? URL : '';
+
   
   
-  
+ 
+  const isFavorites=favorites.some(
+    (favorites)=> favorites.fileId === file._id 
+  )
+   
   return (
 
 
@@ -68,7 +74,7 @@ const Filecard = ({file}:{file:Doc<'files'>} & { url : string | null}) => {
     {file.name}
     </CardTitle>
     <div className='absolute top-1 right-1'>
-      <FileCardActions  file={file}/>
+      <FileCardActions favorite={isFavorites} file={file}/>
     </div>
 
   </CardHeader>

@@ -23,17 +23,17 @@ import React, { ReactNode, useState } from 'react'
   } from "@/components/ui/alert-dialog"
   
 
-  
+
   import { Doc, Id } from '../../../../convex/_generated/dataModel'
 import { Button } from '../../../components/ui/button'
-import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff, StarIcon } from 'lucide-react'
+import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff, StarIcon, StarHalf, StarHalfIcon, FileHeart, FileIcon } from 'lucide-react'
 import { useMutation,  useQuery } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
 import { toast } from '../../../components/ui/use-toast'
 
 
 
-export default function FileCardActions({file}:{file:Doc<'files'>} ){
+export default function FileCardActions({file,favorite}:{file:Doc<'files'>,favorite?:boolean} ){
     const [Isconfiremed,setconfiremed]=useState(false)
     const deletefile= useMutation(api.files.deletefile)
     const Favorite=useMutation(api.files.Favorite)
@@ -79,8 +79,20 @@ export default function FileCardActions({file}:{file:Doc<'files'>} ){
 
 
     }}>
-    <StarIcon className='h-4 w-4 ' />  
-    Favorite
+    {favorite ? 
+    <div className='flex gap-2'>
+        < FileIcon className='w-4 h-4'/>
+        UnFavorite
+        </div>
+
+      :<div className='flex gap-2'>
+    
+      <FileHeart className='w-4 h-4' />
+      favorite
+      </div>
+      }
+  
+
     </DropdownMenuItem>
     <DropdownMenuSeparator/>
     <DropdownMenuItem className='flex gap-1 items-center text-red-500 cursor:pointer'
@@ -92,5 +104,4 @@ export default function FileCardActions({file}:{file:Doc<'files'>} ){
 </DropdownMenu>
 </>
     )
-
 }

@@ -8,7 +8,7 @@ export default function favorites(){
   
   return(
   <div>
-    <Placeholder title="Favorites" favorites={true}/>
+    <Placeholder title="Favorites" favoritesall />
   </div>
   )
 }

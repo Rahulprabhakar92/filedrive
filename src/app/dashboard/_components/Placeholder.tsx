@@ -20,10 +20,15 @@ import Link from "next/link";
 
 
 
-export default function Placeholder({title,favorites}:{title:string,favorites?:boolean}) {
+export default function Placeholder({
+  title,
+  favoritesall}:
+  {title:string,
+   favoritesall?:boolean}) {
   const organization = useOrganization();
   const user = useUser();
   const [query, setQuery] = useState("");
+ 
 
   let orgId: string | undefined;
 
@@ -31,7 +36,14 @@ export default function Placeholder({title,favorites}:{title:string,favorites?:b
     orgId = organization.organization?.id || user.user?.id;
   }
 
-  const getFiles = useQuery(api.files.getFiles, orgId ? { orgId, query,favorites } : "skip");
+  const favorites=useQuery(api.files.getAllfavs,
+    orgId ? { orgId } : "skip");
+
+
+
+  const getFiles = useQuery(api.files.getFiles,
+     orgId ? { orgId, query,favorites:favoritesall } : "skip");
+
   const isLoading = getFiles === undefined;
 
   return (
@@ -73,7 +85,9 @@ export default function Placeholder({title,favorites}:{title:string,favorites?:b
               {getFiles?.map((file: any) => {
                 return (
                   <div key={file.id}>
-                    <Filecard file={file} url={file.url} />
+                    <Filecard file={file} 
+                    favorites={favorites ?? [] } 
+                    url={file.url} />
                   </div>
                 );
               })}
