@@ -10,12 +10,14 @@ import { useToast } from "@/components/ui/use-toast";
 import Submitbutton from "@/app/dashboard/_components/Submitbutton";
 import Filecard from "@/app/dashboard/_components/Filecard";
 import Image from "next/image";
-import { FileIcon, Files, Loader2, StarIcon } from "lucide-react";
+import { FileIcon, Files, GridIcon, Loader2, StarIcon, TableIcon } from "lucide-react";
 import Searchbar from "./Searchbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { DataTable } from "./file-table";
 import { columns } from "./column";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 
 
 
@@ -52,24 +54,23 @@ export default function Placeholder({
 
   const isLoading = getFiles === undefined;
 
-  const modifiedFavs=getFiles?.map((file)=>(
-  {
-    ...file,
-  favorites:favorites?.some(
-    (favorites)=> favorites.fileId===file._id
-  )
-
-  }
-  ))
+  const modifiedFiles =
+    getFiles?.map((file) => ({
+      ...file,
+      isFavorited: (favorites ?? []).some(
+        (favorite) => favorite.fileId === file._id
+      ),
+    })) ?? [];
 
   return (
    <div>
-        <div className="flex w-full justify-between mb-20">
-         
+        <div className="flex w-full justify-between mb-9">
           <h1 className="text-4xl font-bold">Your {title}</h1>
           <Searchbar query={query} setquery={setQuery} />
           <Submitbutton />
         </div>
+
+       
 
         {isLoading ? (
           <div className="flex flex-col w-full gap-8 items-center mt-24">
@@ -97,20 +98,36 @@ export default function Placeholder({
                 <Submitbutton />
               </div>
             )}
+          <Tabs defaultValue="grid" >
+            <TabsList className="mb-10" >
+             <TabsTrigger value="Grid" className="gap-2">
+             <GridIcon className="flex items-center h-6 w-6"/>
+              Grid</TabsTrigger>
 
-            <DataTable columns={columns} data={getFiles} />
-            
-            <div className="grid grid-cols-3 gap-4">
-              {getFiles?.map((file: any) => {
+             <TabsTrigger value="Table" className="gap-2">
+              <TableIcon  className="flex items-center h-6 w-6"/>
+              Table</TabsTrigger>
+            </TabsList>
+          <TabsContent value="Grid">
+
+          <div className="grid grid-cols-3 gap-4 w-full">
+              {modifiedFiles?.map((file: any) => {
                 return (
                   <div key={file.id}>
-                    <Filecard file={file} 
-                    favorites={favorites ?? [] } 
-                    url={file.url} />
+                    <Filecard file={file} key={file._id} />
                   </div>
                 );
               })}
             </div>
+            </TabsContent>
+          <TabsContent value="Table">
+          <DataTable  columns={columns} data={modifiedFiles} />
+            </TabsContent>
+          </Tabs>
+          
+         
+            
+            
           </>
         )}
         </div>

@@ -12,9 +12,13 @@ import {  FileTextIcon, ImageIcon, GanttChartIcon} from 'lucide-react'
 import Image from 'next/image'
 import FileCardActions from './file-actions'
 
+export function Filecard({
+  file,
+}: {
+  file: Doc<"files"> & { isFavorited: boolean; url: string | null };
+})
+{
 
-const Filecard = ({file,favorites}:{file:Doc<'files'>} & { url : string | null} 
-& {favorites:Doc<"favorites">[]}) => {
 
   const typesIcons={
     'image':<ImageIcon/>, 
@@ -22,15 +26,7 @@ const Filecard = ({file,favorites}:{file:Doc<'files'>} & { url : string | null}
     'csv':<GanttChartIcon />,
   }as Record <Doc<"files">['type'],ReactNode>
 
- 
-  const isFavorites=favorites.some(
-    (favorites)=> favorites.fileId === file._id 
-  )
-  
-   
   return (
-
-
     <Card>
   <CardHeader className='relative'>
     <CardTitle className='flex flex-row gap-4 '>
@@ -38,7 +34,7 @@ const Filecard = ({file,favorites}:{file:Doc<'files'>} & { url : string | null}
     {file.name}
     </CardTitle>
     <div className='absolute top-1 right-1'>
-      <FileCardActions favorite={isFavorites} file={file}/>
+      <FileCardActions favorite={ file.isFavorited} file={file}/>
     </div>
 
   </CardHeader>
