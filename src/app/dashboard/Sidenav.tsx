@@ -6,7 +6,7 @@ import { FileIcon, StarIcon, TrashIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-export default function sidenav(){
+export default function Sidenav(){
   const path=usePathname()
     return(
         <div className="w-40 flex flex-col gap-4"> 
