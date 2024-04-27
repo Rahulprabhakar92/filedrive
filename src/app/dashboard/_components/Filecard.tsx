@@ -1,49 +1,16 @@
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode } from 'react'
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
-  } from "@/components/ui/card"
-
-  import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu"
-
-  import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-  } from "@/components/ui/alert-dialog"
-  
-
-  
-  import { Doc, Id } from '../../../../convex/_generated/dataModel'
+  } from "@/components/ui/card"  
+import { Doc } from '../../../../convex/_generated/dataModel'
 import { Button } from '../../../components/ui/button'
-import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff } from 'lucide-react'
-import { useMutation,  useQuery } from 'convex/react'
-import { api } from '../../../../convex/_generated/api'
-import { toast } from '../../../components/ui/use-toast'
+import {  FileTextIcon, ImageIcon, GanttChartIcon} from 'lucide-react'
 import Image from 'next/image'
-import { getURL } from 'next/dist/shared/lib/utils'
 import FileCardActions from './file-actions'
-
-
-
-
 
 
 const Filecard = ({file,favorites}:{file:Doc<'files'>} & { url : string | null} 
@@ -55,14 +22,11 @@ const Filecard = ({file,favorites}:{file:Doc<'files'>} & { url : string | null}
     'csv':<GanttChartIcon />,
   }as Record <Doc<"files">['type'],ReactNode>
 
-  const imageUrl = file.type === "image" && URL ? URL : '';
-
-  
-  
  
   const isFavorites=favorites.some(
     (favorites)=> favorites.fileId === file._id 
   )
+  
    
   return (
 
@@ -93,8 +57,8 @@ const Filecard = ({file,favorites}:{file:Doc<'files'>} & { url : string | null}
   </CardContent>
   <CardFooter className='flex items-center justify-center'>
     <Button onClick={()=>{
-      if(!file.url) return;
-      window.open(file.url,"_blank")
+      if (!file.url) return;
+      window.open(file.url, "_blank");
     }}>
      Download 
     </Button>

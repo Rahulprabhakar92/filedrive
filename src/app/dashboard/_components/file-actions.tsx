@@ -26,16 +26,18 @@ import React, { ReactNode, useState } from 'react'
 
   import { Doc, Id } from '../../../../convex/_generated/dataModel'
 import { Button } from '../../../components/ui/button'
-import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff, StarIcon, StarHalf, StarHalfIcon, FileHeart, FileIcon } from 'lucide-react'
+import { DeleteIcon, FileTextIcon, ImageIcon, MoreVertical, TrashIcon,GanttChartIcon, FileDiff, StarIcon, StarHalf, StarHalfIcon, FileHeart, FileIcon, ArchiveRestoreIcon } from 'lucide-react'
 import { useMutation,  useQuery } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
 import { toast } from '../../../components/ui/use-toast'
+import { Protect } from '@clerk/nextjs'
 
 
 
 export default function FileCardActions({file,favorite}:{file:Doc<'files'>,favorite?:boolean} ){
     const [Isconfiremed,setconfiremed]=useState(false)
     const deletefile= useMutation(api.files.deletefile)
+    const restorefile=useMutation(api.files.restorefile)
     const Favorite=useMutation(api.files.Favorite)
 
 
@@ -46,21 +48,29 @@ export default function FileCardActions({file,favorite}:{file:Doc<'files'>,favor
   <AlertDialogContent>
     <AlertDialogHeader>
       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-      <AlertDialogDescription>
-        This action cannot be undone. This will permanently delete your File
-        and remove your data from our servers.
-      </AlertDialogDescription>
     </AlertDialogHeader>
     <AlertDialogFooter>
       <AlertDialogCancel>Cancel</AlertDialogCancel>
       <AlertDialogAction onClick={()=>{
-        deletefile({fileId:file._id})
+        if(file.shoulddelete){
+          restorefile({fileId:file._id})
 
-        toast({
+          toast({
             variant:"default",
-            title: "File Deleted",
-            description: "U Deleted it ",
+            title: "Restoring file",
+            description: "Your file will be restored",
           })
+
+        }else{
+          deletefile({fileId:file._id})
+
+          toast({
+              variant:"default",
+              title: "File Marked for deletion",
+              description: "Ur file will be deleted soon ",
+            })
+        }
+       
       
 
       }}>Continue</AlertDialogAction>
@@ -94,12 +104,28 @@ export default function FileCardActions({file,favorite}:{file:Doc<'files'>,favor
   
 
     </DropdownMenuItem>
-    <DropdownMenuSeparator/>
+
+    {/* <Protect
+      permission="org:admin"
+      fallback={<p></p>}
+    >   */}
+    {file.shoulddelete  ?   
+    <DropdownMenuItem className='flex gap-1 items-center text-green-500 cursor:pointer'
+    onClick={()=>{
+     
+        setconfiremed(true)
+ 
+      }}>
+        <ArchiveRestoreIcon className='h-4 w-4 ' />  
+            Restore
+    </DropdownMenuItem>
+    :
     <DropdownMenuItem className='flex gap-1 items-center text-red-500 cursor:pointer'
     onClick={()=>{setconfiremed(true)}}>
-    <TrashIcon className='h-4 w-4 ' />  
-    Delete
-    </DropdownMenuItem>
+        <TrashIcon className='h-4 w-4 ' />  
+            Delete
+    </DropdownMenuItem>}
+    {/* </Protect> */}
   </DropdownMenuContent>
 </DropdownMenu>
 </>

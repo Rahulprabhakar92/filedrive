@@ -14,6 +14,8 @@ import { FileIcon, Files, Loader2, StarIcon } from "lucide-react";
 import Searchbar from "./Searchbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { DataTable } from "./file-table";
+import { columns } from "./column";
 
 
 
@@ -22,9 +24,13 @@ import Link from "next/link";
 
 export default function Placeholder({
   title,
-  favoritesall}:
+  favoritesall,
+  permdelete
+}:
   {title:string,
-   favoritesall?:boolean}) {
+   favoritesall?:boolean,
+   permdelete?:boolean
+  }) {
   const organization = useOrganization();
   const user = useUser();
   const [query, setQuery] = useState("");
@@ -42,9 +48,19 @@ export default function Placeholder({
 
 
   const getFiles = useQuery(api.files.getFiles,
-     orgId ? { orgId, query,favorites:favoritesall } : "skip");
+     orgId ? { orgId, query,favorites:favoritesall,permdelete } : "skip");
 
   const isLoading = getFiles === undefined;
+
+  const modifiedFavs=getFiles?.map((file)=>(
+  {
+    ...file,
+  favorites:favorites?.some(
+    (favorites)=> favorites.fileId===file._id
+  )
+
+  }
+  ))
 
   return (
    <div>
@@ -81,6 +97,9 @@ export default function Placeholder({
                 <Submitbutton />
               </div>
             )}
+
+            <DataTable columns={columns} data={getFiles} />
+            
             <div className="grid grid-cols-3 gap-4">
               {getFiles?.map((file: any) => {
                 return (

@@ -1,8 +1,9 @@
-import { MutationCtx, QueryCtx, mutation, query } from "./_generated/server";
+import { MutationCtx, QueryCtx, internalMutation, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { getUser } from "./users";
 import { error } from "console";
 import { Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
 
 
 async function hasAccestoorg(
@@ -41,6 +42,20 @@ export const generateUploadUrl = mutation(async (ctx) => {
   return await ctx.storage.generateUploadUrl();
 });
 
+export const deleteperm=internalMutation({
+
+  async handler(ctx){
+    const file=await ctx.db.query('files')
+    .withIndex('by_shoulddelete',(q)=>q.eq('shoulddelete',true))
+    .collect()
+
+    await Promise.all(( file.map(
+      async (file)=>{
+      ctx.storage.delete(file.fileId)
+      return await ctx.db.delete(file._id)
+    })))
+  }
+})
 
 export const createFile=mutation({
   args:{
@@ -67,7 +82,7 @@ export const createFile=mutation({
       fileId:args.fileId,
       orgId:args.orgId,
       type:args.type,
-      url:""
+      url:''
     })
   }
 })
@@ -76,7 +91,8 @@ export const getFiles = query({
   args: {
     orgId: v.string(),
     query: v.optional(v.string()), // Include query field as optional
-    favorites:v.optional(v.boolean())
+    favorites:v.optional(v.boolean()),
+    permdelete:v.optional(v.boolean())
   },
   async handler(ctx, args) {
     const identity = await ctx.auth.getUserIdentity();
@@ -118,6 +134,15 @@ export const getFiles = query({
         
       );
     }
+
+
+    if(args.permdelete){
+      files=files.filter((file)=>file.shoulddelete)
+    }else{
+      files=files.filter((file)=>!file.shoulddelete)
+    }
+
+    
    
 
     let filesWithUrl = await Promise.all(
@@ -166,7 +191,35 @@ export const deletefile=mutation({
 
     if(!hasAcces)  throw new ConvexError("you do not have assces to delete this file")
 
-    await ctx.db.delete(args.fileId)
+    // await ctx.db.delete(args.fileId)
+
+    await ctx.db.patch(args.fileId,{
+      shoulddelete:true
+    })
+    
+
+  }
+})
+
+export const restorefile=mutation({
+  args:{
+    fileId:v.id("files")
+  },
+  async handler(ctx,args){
+   
+    const file =  await ctx.db.get(args.fileId)
+
+    if(!file) throw new ConvexError("this file does not exist")
+
+    const hasAcces= await hasAccestoorg(ctx,file.orgId)
+
+    if(!hasAcces)  throw new ConvexError("you do not have assces to delete this file")
+
+    // await ctx.db.delete(args.fileId)
+
+    await ctx.db.patch(args.fileId,{
+      shoulddelete:false
+    })
     
 
   }

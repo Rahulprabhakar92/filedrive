@@ -7,9 +7,11 @@ export default defineSchema({
     type:v.union(v.literal("image"),v.literal("csv"),v.literal("pdf")),
     orgId:v.string(), 
     fileId:v.id("_storage"),
-    url:v.string()
+    url:v.string(),
+    shoulddelete:v.optional(v.boolean())
   })
-  .index("by_orgId",['orgId']),
+  .index("by_orgId",['orgId'])
+  .index("by_shoulddelete",['shoulddelete']),
 
   favorites:defineTable({
     fileId:v.id('files'),
