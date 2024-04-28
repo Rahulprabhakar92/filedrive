@@ -1,14 +1,20 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+export const fileTypes = v.union(
+  v.literal("image"),
+  v.literal("csv"),
+  v.literal("pdf")
+);
+
 export default defineSchema({
   files: defineTable({ 
     name: v.string() ,
-    type:v.union(v.literal("image"),v.literal("csv"),v.literal("pdf")),
+    type:fileTypes,
     orgId:v.string(), 
     fileId:v.id("_storage"),
-    url:v.string(),
-    shoulddelete:v.optional(v.boolean())
+    shoulddelete:v.optional(v.boolean()),
+    url:v.optional(v.string())
   })
   .index("by_orgId",['orgId'])
   .index("by_shoulddelete",['shoulddelete']),

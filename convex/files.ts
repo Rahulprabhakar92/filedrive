@@ -4,6 +4,7 @@ import { getUser } from "./users";
 import { error } from "console";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
+import { fileTypes } from "./schema";
 
 
 async function hasAccestoorg(
@@ -82,7 +83,6 @@ export const createFile=mutation({
       fileId:args.fileId,
       orgId:args.orgId,
       type:args.type,
-      url:''
     })
   }
 })
@@ -90,9 +90,10 @@ export const createFile=mutation({
 export const getFiles = query({
   args: {
     orgId: v.string(),
-    query: v.optional(v.string()), // Include query field as optional
+    query: v.optional(v.string()), 
     favorites:v.optional(v.boolean()),
-    permdelete:v.optional(v.boolean())
+    permdelete:v.optional(v.boolean()),
+    type:v.optional(fileTypes)
   },
   async handler(ctx, args) {
     const identity = await ctx.auth.getUserIdentity();
@@ -142,6 +143,9 @@ export const getFiles = query({
       files=files.filter((file)=>!file.shoulddelete)
     }
 
+    if(args.type){
+      files=files.filter((file)=>file.type === args.type)
+    }
     
    
 

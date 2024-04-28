@@ -5,14 +5,14 @@ import { Doc, Id } from "../../../../convex/_generated/dataModel";
 import { formatRelative } from "date-fns";
 
 import FileCardActions from "./file-actions";
+ 
 
 
 
 
 
-export const columns: ColumnDef<
-  Doc<"files"> & { url: string; isFavorited: boolean }
->[] = [
+
+export const columns: ColumnDef<Doc<"files"> & { url: string; isFavorited: boolean }>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -40,7 +40,6 @@ export const columns: ColumnDef<
             file={row.original}
             favorite={row.original.isFavorited}
           />
-          
         </div>
       );
     },
