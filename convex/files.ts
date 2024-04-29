@@ -149,15 +149,14 @@ export const getFiles = query({
     
    
 
-    let filesWithUrl = await Promise.all(
+    const filesWithUrl = await Promise.all(
       files.map(async (file) => ({
         ...file,
         url: await ctx.storage.getUrl(file.fileId),
       }))
     );
-    
-   
-    return filesWithUrl
+
+    return filesWithUrl;
 
   }
 });

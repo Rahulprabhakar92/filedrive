@@ -9,7 +9,7 @@ import Image from "next/image";
 import { FileIcon, Files, GridIcon, Loader2, StarIcon, TableIcon } from "lucide-react";
 import Searchbar from "./Searchbar";
 import { DataTable } from "./file-table";
-import { columns } from "./column";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Select,
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select"
 import { Value } from "@radix-ui/react-select";
 import { Doc } from "../../../../convex/_generated/dataModel";
+import { columns } from "./columns";
 
 
 export default function Placeholder({
@@ -125,7 +126,7 @@ export default function Placeholder({
             </div>
             </TabsContent>
           <TabsContent value="Table">
-          <DataTable  columns={columns} data={modifiedFiles} />
+          <DataTable columns={columns} data={modifiedFiles} />
             </TabsContent>
           </Tabs>
 
@@ -159,10 +160,6 @@ export default function Placeholder({
                 <Submitbutton />
               </div>
             )}
-
-
-
-
           </>
         )}
         </div>

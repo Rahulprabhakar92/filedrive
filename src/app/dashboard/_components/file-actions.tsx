@@ -34,7 +34,7 @@ import { Protect } from '@clerk/nextjs'
 
 
 
-export default function FileCardActions({file,favorite}:{file: Doc<"files"> & { url: string | null },favorite?:boolean} ){
+export default function FileCardActions({file,favorite}:{file: Doc<"files"> & { url: string | null },favorite:boolean} ){
     const [Isconfiremed,setconfiremed]=useState(false)
     const deletefile= useMutation(api.files.deletefile)
     const restorefile=useMutation(api.files.restorefile)

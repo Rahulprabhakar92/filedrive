@@ -28,7 +28,7 @@ export function Filecard({
 
   return (
     <Card>
-  <CardHeader className='relative'>
+  <CardHeader className='relative bg-gray-100'>
     <CardTitle className='flex flex-row gap-4 '>
     <p>{typesIcons[file.type]}</p>
     {file.name}
@@ -38,7 +38,7 @@ export function Filecard({
     </div>
 
   </CardHeader>
-  <CardContent className='h-[200px]  flex justify-center items-center '>
+  <CardContent className='h-[200px]  flex justify-center items-center bg-gray-50 '>
 
       {file.type === "image" && file.url && (
         <Image alt={file.name} width="200" height="100" src={file.url} />
@@ -51,7 +51,7 @@ export function Filecard({
       <GanttChartIcon  className=' w-20 h-20'/>
     )}
   </CardContent>
-  <CardFooter className='flex items-center justify-center'>
+  <CardFooter className='flex items-center justify-center bg-gray-50'>
     <Button onClick={()=>{
       if (!file.url) return;
       window.open(file.url, "_blank");

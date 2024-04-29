@@ -12,7 +12,9 @@ import FileCardActions from "./file-actions";
 
 
 
-export const columns: ColumnDef<Doc<"files"> & { url: string; isFavorited: boolean }>[] = [
+export const columns: ColumnDef<
+  Doc<"files"> & { url: string; isFavorited: boolean }
+>[] = [
   {
     accessorKey: "name",
     header: "Name",
