@@ -6,7 +6,7 @@ import { useState } from "react";
 import Submitbutton from "@/app/dashboard/_components/Submitbutton";
 import Filecard from "@/app/dashboard/_components/Filecard";
 import Image from "next/image";
-import { FileIcon, Files, GridIcon, Loader2, StarIcon, TableIcon } from "lucide-react";
+import { Columns, FileIcon, Files, GridIcon, Loader2, StarIcon, TableIcon } from "lucide-react";
 import Searchbar from "./Searchbar";
 import { DataTable } from "./file-table";
 
@@ -21,6 +21,7 @@ import {
 import { Value } from "@radix-ui/react-select";
 import { Doc } from "../../../../convex/_generated/dataModel";
 import { columns } from "./columns";
+
 
 
 export default function Placeholder({

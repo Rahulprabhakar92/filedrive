@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table"
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<any, TValue>[]
+  columns: ColumnDef<TData, TValue>[]
   data: TData[]
 }
 
